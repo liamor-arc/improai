@@ -1,0 +1,30 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Demo",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./demo.py",
+            "args": [],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+    ],
+    "inputs": [{
+        "id": "xlaunch_ip",
+        "type": "command",
+        "command": "shellCommand.execute",
+        "args": {
+            "command": "ip route list default | awk '{print $3}'"
+        }
+    }, {
+        "id": "pickConfigFile",
+        "type": "command",
+        "command": "extension.commandvariable.file.pickFile",
+        "args": {
+            "include": "src/config/**/*",
+            "description": "Pick a config file"
+        } 
+    }]
+}
