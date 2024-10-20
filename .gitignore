@@ -1,3 +1,4 @@
 .history
 .venv
 environment.yml
+*.log

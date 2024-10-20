@@ -2,10 +2,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Demo",
+            "name": "Python: Demo ChatGPT",
             "type": "debugpy",
             "request": "launch",
-            "program": "./demo.py",
+            "program": "./demo_chatgpt.py",
+            "args": [],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Demo Conversation",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./demo_conversation.py",
             "args": [],
             "console": "integratedTerminal",
             "justMyCode": false
