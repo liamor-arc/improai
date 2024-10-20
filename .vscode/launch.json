@@ -19,6 +19,17 @@
             "console": "integratedTerminal",
             "justMyCode": false
         },
+        {
+            "name": "Python: Demo Conversation w Interrupt",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./demo_conversation.py",
+            "args": [
+                "--can_interrupt"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
     ],
     "inputs": [{
         "id": "xlaunch_ip",
