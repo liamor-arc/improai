@@ -47,6 +47,15 @@
             "args": [],
             "console": "integratedTerminal",
             "justMyCode": false
+        },
+        {
+            "name": "Python: Demo Word-for-Word on Demand",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./demo_wordforword.py",
+            "args": [],
+            "console": "integratedTerminal",
+            "justMyCode": false
         }
     ],
     "inputs": [{

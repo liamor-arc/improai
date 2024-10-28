@@ -28,6 +28,10 @@ def main(config_file, instruction_file):
         {
             "role": "system",
             "content": instructions["openai"]
+        },
+        {
+            "role": "user",
+            "content": ""
         }
     ]
     
@@ -43,24 +47,20 @@ def main(config_file, instruction_file):
         region=config["azure-speech"]["region"],
         speech_recognition_language="en-US"
     )
-    speech_config.set_property(property_id=speechsdk.PropertyId.SpeechServiceResponse_DiarizeIntermediateResults, value='true')
     audio_config = speechsdk.AudioConfig(use_default_microphone = True)
     conversation_transcriber = speechsdk.transcription.ConversationTranscriber(speech_config=speech_config, audio_config=audio_config)
     
     def transcribing_cb(evt: speechsdk.SpeechRecognitionEventArgs):
-        logging.info(f"Transcribing: Speaker {evt.result.speaker_id}: {evt.result.text}")
+        logging.info(f"Transcribing: {evt.result.text}")
 
     def transcribed_cb(evt: speechsdk.SpeechRecognitionEventArgs):
         if evt.result.reason == speechsdk.ResultReason.RecognizedSpeech:
-            logging.info(f"Transcribed: Speaker {evt.result.speaker_id}: {evt.result.text}")
+            logging.info(f"Transcribed: {evt.result.text}")
             if not evt.result.text:
                 return
-            print(f'{evt.result.speaker_id}: {evt.result.text}')
-            conversation.append({
-                "role": "user",
-                "name": evt.result.speaker_id,
-                "content": evt.result.text
-            })
+            text = evt.result.text.split(" ")[0]
+            print(text + " ", end="")
+            conversation[1] += text + " "
         elif evt.result.reason == speechsdk.ResultReason.NoMatch:
             logging.error('NOMATCH: Speech could not be TRANSCRIBED: {}'.format(evt.result.no_match_details))
 
@@ -77,7 +77,7 @@ def main(config_file, instruction_file):
 
     signal.signal(signal.SIGINT, signal_handler)
     print('Press Ctrl+C to quit the program')
-    print('Press any key to have ChatGPT continue the conversation')
+    print('Press any key to have ChatGPT continue the sentence')
     while True:
         time.sleep(0.1)
         event = keyboard.read_event()
@@ -89,23 +89,18 @@ def main(config_file, instruction_file):
                 messages=conversation,
                 stream=True
             )
-            message = {
-                "role": "assistant",
-                "content": ""
-            }
-            conversation.append(message)
-            print('\x1b[1;33;42m ChatGPT:')
+            response = ""
             for chunk in stream:
                 if chunk.choices[0].delta.content is not None:
-                    print(chunk.choices[0].delta.content, end="")
-                    message["content"] += chunk.choices[0].delta.content
-            print('\x1b[0m\n')
-            logging.info("Response ChatGPT: {}".format(message["content"]))
+                    response += chunk.choices[0].delta.content
+            text = response.split(" ")[0]
+            print(f'\x1b[1;33;42m{text}\x1b[0m ', end="")
+            logging.info("Response ChatGPT: {}".format(response))
             logging.info("Generating sound file with 'echo' voice and pcm")
             response = client.audio.speech.create(
                 model="tts-1",
                 voice="echo",
-                input=message["content"],
+                input=text,
                 response_format="pcm"
             )
             audio = pyaudio.PyAudio()
@@ -114,7 +109,7 @@ def main(config_file, instruction_file):
                 audio_stream.write(audio_chunk)
             audio_stream.stop_stream()
             conversation_transcriber.start_transcribing_async().get()
-            print('Press any key to have ChatGPT continue the conversation')
+            print('Press any key to have ChatGPT continue the sentence')
 
 if __name__ == '__main__':        
     parser = argparse.ArgumentParser()
