@@ -11,6 +11,15 @@
             "justMyCode": false
         },
         {
+            "name": "Python: Demo Transcription",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./demo_transcription.py",
+            "args": [],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
             "name": "Python: Demo Conversation",
             "type": "debugpy",
             "request": "launch",
@@ -30,6 +39,15 @@
             "console": "integratedTerminal",
             "justMyCode": false
         },
+        {
+            "name": "Python: Demo Conversation on Demand",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./demo_ondemand.py",
+            "args": [],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
     ],
     "inputs": [{
         "id": "xlaunch_ip",
