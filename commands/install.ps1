@@ -4,7 +4,7 @@ python -m venv .venv
 
 python -m pip install --upgrade pip
 
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 pip install -r requirements.txt
 
 deactivate
