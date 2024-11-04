@@ -45,7 +45,7 @@ def main(config_file, instruction_file):
     speech_config = speechsdk.SpeechConfig(
         subscription=config["azure-speech"]["api-key"],
         region=config["azure-speech"]["region"],
-        speech_recognition_language="en-US"
+        speech_recognition_language="nl-be"
     )
     audio_config = speechsdk.AudioConfig(use_default_microphone = True)
     conversation_transcriber = speechsdk.transcription.ConversationTranscriber(speech_config=speech_config, audio_config=audio_config)
@@ -58,9 +58,14 @@ def main(config_file, instruction_file):
             logging.info(f"Transcribed: {evt.result.text}")
             if not evt.result.text:
                 return
-            text = evt.result.text.split(" ")[0]
+            text = evt.result.text
+            while text[0] in [".", ","]:
+                text = text[1:]
+            text = text.split(" ")[0].lower()
+            if text[-1] in [".", ",", "?", "!", ";"]:
+                text = text[0:-1]
             print(text + " ", end="")
-            conversation[1] += text + " "
+            conversation[1]["content"] += text + " "
         elif evt.result.reason == speechsdk.ResultReason.NoMatch:
             logging.error('NOMATCH: Speech could not be TRANSCRIBED: {}'.format(evt.result.no_match_details))
 
@@ -93,7 +98,13 @@ def main(config_file, instruction_file):
             for chunk in stream:
                 if chunk.choices[0].delta.content is not None:
                     response += chunk.choices[0].delta.content
-            text = response.split(" ")[0]
+            text = response
+            while text[0] in [".", ","]:
+                text = text[1:]
+            text = text.split(" ")[0].lower()
+            # if text[-1] in [".", ",", "?", "!", ";"]:
+            #    text = text[0:-1]
+            conversation[1]["content"] += text + " "
             print(f'\x1b[1;33;42m{text}\x1b[0m ', end="")
             logging.info("Response ChatGPT: {}".format(response))
             logging.info("Generating sound file with 'echo' voice and pcm")
@@ -109,7 +120,6 @@ def main(config_file, instruction_file):
                 audio_stream.write(audio_chunk)
             audio_stream.stop_stream()
             conversation_transcriber.start_transcribing_async().get()
-            print('Press any key to have ChatGPT continue the sentence')
 
 if __name__ == '__main__':        
     parser = argparse.ArgumentParser()

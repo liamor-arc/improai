@@ -37,7 +37,7 @@ async def main(config_file):
     speech_config = speechsdk.SpeechConfig(
         subscription=config["azure-speech"]["api-key"],
         region=config["azure-speech"]["region"],
-        speech_recognition_language="en-US"
+        speech_recognition_language="nl-be"
     )
     speech_config.set_property(property_id=speechsdk.PropertyId.SpeechServiceResponse_DiarizeIntermediateResults, value='true')
     audio_config = speechsdk.AudioConfig(use_default_microphone = True)
@@ -57,12 +57,8 @@ async def main(config_file):
                 "name": evt.result.speaker_id,
                 "content": evt.result.text
             })
-            response = {
-                "action": "conversation",
-                "conversation": conversation
-            }
             for websocket in connected_clients:
-                websocket.send(json.dumps(response))
+                asyncio.run(send(websocket))
             
         elif evt.result.reason == speechsdk.ResultReason.NoMatch:
             logging.error('NOMATCH: Speech could not be TRANSCRIBED: {}'.format(evt.result.no_match_details))
@@ -74,7 +70,8 @@ async def main(config_file):
     conversation_transcriber.start_transcribing_async().get()  # wait for voidfuture, so we know engine initialization is done.
     print('Continuous Recognition is now running, say something.')
 
-    async def handler(websocket): 
+    async def handler(websocket):
+        connected_clients.append(websocket)
         async for message in websocket:
             logging.info(f"Websocket Request: ${message}")
             print(f"<<< {message}")
@@ -127,7 +124,15 @@ async def main(config_file):
             }
             await websocket.send(json.dumps(response))
         print("Closed connection")
+        connected_clients.remove(websocket)
     
+    async def send(websocket):
+        response = {
+            "action": "conversation",
+            "conversation": conversation
+        }
+        await websocket.send(json.dumps(response))
+
     async with serve(handler, "127.0.0.1", 4000):
         await asyncio.get_running_loop().create_future()
 

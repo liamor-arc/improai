@@ -9,6 +9,7 @@ export default function Home() {
 	const [conversation, setConversation] = useState([]);
 	const [showInstructions, setShowInstructions] = useState(false);
 	const [instructions, setInstructions] = useState("");
+	const [edit, setEdit] = useState<null|[number, string]>(null);
 
 	useEffect(() => {
 		function onOpen() {
@@ -60,6 +61,32 @@ export default function Home() {
 		setInstructions(event.target.value);
 	}
 
+	function editMessage(index:number, message:string) {
+		if(edit==null) {
+			setEdit([index, message]);
+		} else {
+			socket.send(JSON.stringify({
+				action: "change",
+				index: edit[0],
+				message: edit[1] 
+			}));
+			setEdit(null);
+		}
+	}
+
+	function changeEditMessage(event:ChangeEvent<HTMLTextAreaElement>) {
+		if(edit!=null) {
+			setEdit([edit[0], event.target.value]);
+		}
+	}
+
+	function removeMessage(index:number) {
+		socket.send(JSON.stringify({
+			action: "remove",
+			index: index
+		}));
+	}
+
 	return (
 		<Fragment>
 			<div className={(showInstructions?"":"hidden ") + "relative z-10"}>
@@ -92,7 +119,15 @@ export default function Home() {
 								<div key={index} className={(item.role=="assistant"?"justify-end ":"") + "flex mb-4 cursor-pointer"}>
 									<div className={(item.role=="assistant"?"bg-green-500 text-white ":"bg-white ") + "flex max-w-96 bg-white rounded-lg p-3 gap-3"}>
 									<p>{index==0?("Instructions"):item.name}</p>
-									<p className="text-gray-700">{item.content}</p>
+									{edit!=null&&edit[0]==index?(
+										<textarea value={edit[1]} onChange={changeEditMessage}/>
+									):(<p className="text-gray-700">{item.content}</p>)}
+									{index!=0?(
+										<p className="flex">
+											<Image onClick={(event) => editMessage(index, item.content)} src="/edit.png" alt="Edit Message" width={20} height={20}/>
+											<Image onClick={(event) => removeMessage(index)} src="/rubbish-bin.png" alt="Remove Message" width={20} height={20}/>
+										</p>
+									):""}
 									</div>
 								</div>);
 							})
