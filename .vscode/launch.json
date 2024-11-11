@@ -43,6 +43,16 @@
             "justMyCode": false
         },
         {
+            "name": "Python: Server",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "./server.py",
+            "args": [],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "subProcess": true
+        },
+        {
             "name": "Python: Demo ChatGPT",
             "type": "debugpy",
             "request": "launch",

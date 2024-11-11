@@ -4,15 +4,10 @@ import pyaudio
 import logging
 import asyncio
 import json
-from openai import OpenAI
-import azure.cognitiveservices.speech as speechsdk
+from improai.Logging import initializeLogging
 from websockets.asyncio.server import serve
 
-logging.basicConfig(filename="log.log",
-                    filemode='a',
-                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%H:%M:%S',
-                    level=logging.DEBUG)
+initializeLogging("log.log")
 
 async def main(config_file):
     with open(config_file, 'r') as file:
