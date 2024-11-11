@@ -41,7 +41,7 @@ async def main(config_file):
             sync()
         def onAssistantDone(message):
             sync()
-            audio_stream.play(message)
+            # audio_stream.play(message)
         conversation.onTranscribed(sync)
         conversation.onAssistantGenerating(onAssistantGenerating)
         conversation.onAssistantDone(onAssistantDone)

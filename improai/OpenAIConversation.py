@@ -20,7 +20,7 @@ class OpenAIConversation:
         speech_config = speechsdk.SpeechConfig(
             subscription=self.config["azure-speech"]["api-key"],
             region=self.config["azure-speech"]["region"],
-            speech_recognition_language="en-us"
+            speech_recognition_language="nl-be"
         )
         speech_config.set_property(property_id=speechsdk.PropertyId.SpeechServiceResponse_DiarizeIntermediateResults, value='true')
         speech_config.set_property(property_id=speechsdk.PropertyId.Speech_LogFilename, value=".log/SpeechSDKLog.log")
@@ -130,8 +130,8 @@ class OpenAIConversation:
         print(f'\x1b[1;33;42m ChatGPT: {message["content"]}\x1b[0m\n')
         self.generating = False
         logging.info("Response ChatGPT: {}".format(message["content"]))
-        self.eventHandler.emit("assistant_done", message["content"])
         if prevTranscribing:
             self.transcribing = True
             self.conversation_transcriber.start_transcribing_async().get()
+        self.eventHandler.emit("assistant_done", message["content"])
         

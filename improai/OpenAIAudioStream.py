@@ -15,7 +15,7 @@ class OpenAIAudioStream:
         logging.info("Generating sound file with 'echo' voice and pcm")
         response = await self.client.audio.speech.create(
                 model="tts-1",
-                voice="echo",
+                voice="nova",
                 input=message,
                 response_format="pcm"
             )
